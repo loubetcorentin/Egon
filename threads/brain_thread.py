@@ -26,12 +26,15 @@ def brain_thread():
 
             case brain.searching:
                 if ShortTermMem.get_vision_output():
-                    Voice.say("I see")
+                    Voice.say("oh")
                     brain.see_someone()
+                else:
+                    if randint(0, 100) < 30:
+                        Voice.say("hm")
 
             case brain.excited:
                 if randint(0, 100) < 30:
-                    Voice.say("got bored")
+                    Voice.say("meh")
                     brain.get_bored()
 
 

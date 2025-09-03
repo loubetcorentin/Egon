@@ -1,84 +1,23 @@
-# Egon
+# 👁️🥚Egon
 
-Projet en vision par ordinateur et deep learning.  
-Ce dépôt contient le code, les scripts de sauvegarde et d’utilisation, ainsi que différents modèles.
+This repo contains the 2025 rework of the Egon codebase.
 
-⚠️ Certains fichiers lourds (>100 Mo) ne sont pas inclus dans GitHub.  
-Merci de les télécharger séparément (voir ci-dessous).
+## Env
+We are using a conda env with poetry for the libraries. 
 
----
+## File Structure
 
-## 📦 Installation
+main.py: the main file that starts all the threads
 
-Cloner le repo :
+threads/ : the different threads of the project.
+- brain_thread.py manage "decision making and emotional state" of Egon by reading inputs from the memory and sending signals to the emotion state machine and the outputs (motors, sounds, lights?)
+- vision_thread.py processes the camera feed and writes its detections to the short term memory.
+- forgetting thread.py slowly erase data from the memory 
+- consolee_thread.py manage nice console output with the rich library 
 
-```bash
-git clone https://github.com/loubetcorentin/Egon.git
-cd Egon
-```
+modules/ : modules and classes used by the threads
+- emotional_state.py : the state machine of possible emotions and their transitions
+- logger.py : manage logging in console and log file egon.log
+- short_term_memory.py : stores the things seen by the 
 
-Créer un environnement Python (recommandé) :
 
-```bash
-python -m venv venv
-# Linux / macOS
-source venv/bin/activate
-# Windows
-venv\Scripts\activate
-```
-
-Installer les dépendances :
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-## 📂 Organisation du projet
-
-```
-Egon/
-│
-├── model_checkpoints/     # Checkpoints lourds (ignorés dans Git)
-├── pose/                  # Modèles de pose
-├── pretrained_models/     # Modèles pré-entraînés
-├── backup_lastnight.py    # Script sauvegarde
-├── backup_morning.py      # Script sauvegarde
-├── main.py                # Script principal
-├── parameters.py          # Paramètres
-├── yolofunctions.py       # Fonctions YOLO
-└── README.md              # Ce fichier
-```
-
----
-
-## 💾 Fichiers lourds
-
-Les modèles trop volumineux (>100 Mo) doivent être téléchargés séparément.  
-
-- [Lien fichiers lourds](https://drive.google.com/drive/folders/1JpiX4WwjbtErujevvYzJvpl9jgIjVw-L?usp=sharing)
-
----
-
-## 🚀 Exemple d’utilisation
-
-```bash
-python main.py --input image.jpg --model sauvegarde/yolov4.onnx
-```
-
----
-
-## 🤝 Contribution
-
-1. Fork le repo  
-2. Crée une branche (`git checkout -b feature/ma-feature`)  
-3. Commit (`git commit -m "Ajout ma feature"`)  
-4. Push (`git push origin feature/ma-feature`)  
-5. Ouvre une Pull Request  
-
----
-
-## 📜 Licence
-
-[MIT](LICENSE) – libre utilisation et modification
