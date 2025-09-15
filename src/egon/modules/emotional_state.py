@@ -16,6 +16,8 @@ class EmotionalJourneySM(StateMachine):
     drink_coffe = waking.to(searching)
     see_someone = searching.to(excited)
     get_bored = excited.to(searching)
+    
+    
 
 
 class EmotionalState:

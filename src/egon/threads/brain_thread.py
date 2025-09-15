@@ -45,5 +45,7 @@ def brain_thread():
                     brain.get_bored()
 
 
+
+
 if __name__ == "__main__":  # for debugging
     brain_thread()

@@ -8,20 +8,19 @@ class BufferServo:
     def __init__(self, pin):
         self.pin = pin
         self.current_value = 0
-        self.goal_value = 0
+        self._goal_value = 0
         self.running = True
         self.max_seconds_per_degree = 0.005
-        self.speed_ratio = 1
+        self._speed_ratio = 1
 
         self.th = threading.Thread(target=self.threadloop)
         self.th.start()
-        
-        
+
     def inch_closer(self):
-        if self.goal_value > self.current_value:
-            self.current_value += self.speed_ratio
-        if self.goal_value < self.current_value:
-            self.current_value -= self.speed_ratio
+        if self._goal_value > self.current_value:
+            self.current_value += self._speed_ratio
+        if self._goal_value < self.current_value:
+            self.current_value -= self._speed_ratio
 
     def threadloop(self):
         while self.running:
@@ -32,14 +31,12 @@ class BufferServo:
     def send_msg(self):
         self.pin.write(self.current_value)
 
-    def write(self, value, speed_ratio=1):
-        """This is the function to send orders to the motor
+    def set_goal(self, value=90):
+        self._goal_value = max(min(180, value), 0)
+        logger.info(self._goal_value)
 
-        Args:
-            value (_type_): _description_
-        """
-        self.goal_value = value
-        self.speed_ratio = speed_ratio
+    def set_speed(self, value=1):
+        self._speed_ratio = max(min(1, value), 0)
 
     def kill(self):
         self.running = False
@@ -57,26 +54,42 @@ class Neck:
         logger.info("[#55FF88][r]🦿🙃🦿 succesful [/r][/#55FF88]")
 
     @classmethod
-    def move_to(cls, angle, speed_ratio):
-        cls.BS.write(angle, speed_ratio)
+    def move_to(cls, angle, speed_ratio=1):
+        cls.BS.set_speed(speed_ratio)
+        cls.BS.set_goal(angle)
 
     @classmethod
-    def move_by(cls, angle, speed_ratio):
-        cls.BS.write(cls.BS.current_value+angle, speed_ratio)
+    def move_by(cls, angle, speed_ratio=1):
+        cls.BS.set_speed(speed_ratio)
+        cls.BS.set_goal(cls.BS.current_value + angle)
+
+    @classmethod
+    def freeze(cls):
+        cls.BS.set_speed(1)
+        cls.BS.set_goal(cls.BS.current_value)
+
+    @classmethod
+    def make_space(cls, angle=10):
+        if cls.BS.current_value < angle:
+            cls.move_to(angle)
+        elif cls.BS.current_value > 180 - angle:
+            cls.move_to(180 - angle)
+
+    @classmethod
+    def act_no(cls):
+        cls.make_space(20)
+        time.sleep(0.2)
+        cls.move_by(-20, speed_ratio=0.4)
+        time.sleep(0.2)
+        cls.move_by(40, speed_ratio=0.4)
+        time.sleep(0.2)
+        cls.move_by(-40, speed_ratio=0.4)
+        time.sleep(0.2)
+        cls.move_by(40, speed_ratio=0.4)
+        time.sleep(0.2)
+        cls.move_by(-40, speed_ratio=0.4)
+        time.sleep(0.2)
+        cls.move_by(20, speed_ratio=0.4)
 
 
 Neck.init_neck()
-
-
-def act_no():
-    Neck.move_to(90, speed_ratio=1)
-    time.sleep(0.4)
-    Neck.move_to(45, speed_ratio=0.3)
-    time.sleep(0.4)
-    Neck.move_to(135, speed_ratio=0.3)
-    time.sleep(0.4)
-    Neck.move_to(45, speed_ratio=0.3)
-    time.sleep(0.4)
-    Neck.move_to(135, speed_ratio=0.3)
-    time.sleep(0.4)
-    Neck.move_to(90, speed_ratio=1)
