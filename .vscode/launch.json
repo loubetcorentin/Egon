@@ -10,7 +10,8 @@
       "type": "debugpy",
       "request": "launch",
       "program": "${file}",
-      "console": "integratedTerminal"
+      "console": "integratedTerminal",
+      "cwd": "C:\\Users\\nicol\\Documents\\Github\\Egon"
     },
     {
       "name": "EGON main",

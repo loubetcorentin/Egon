@@ -4,7 +4,7 @@ It links the outputs of the sensors in the Short Term Memory to the emotional st
 
 from modules.short_term_memory import ShortTermMem
 from modules.emotional_state import EmotionalState
-from modules.voice import Voice
+from modules.voice import Voice, get_excited_ono , get_bored_ono
 from modules.logger import logger
 from time import sleep
 from random import randint
@@ -26,15 +26,20 @@ def brain_thread():
 
             case brain.searching:
                 if ShortTermMem.get_vision_output():
-                    Voice.say("oh")
+                    # Voice.say("oh")
+                    ono = get_excited_ono()
+                    Voice.say(ono)
                     brain.see_someone()
                 else:
                     if randint(0, 100) < 30:
-                        Voice.say("hm")
+                        pass
 
             case brain.excited:
-                if randint(0, 100) < 30:
-                    Voice.say("meh")
+                if randint(0, 100) < 15:
+                    ono = get_bored_ono()
+                    Voice.say(ono)
+                    
+                    # Voice.say("meh")
                     brain.get_bored()
 
 
