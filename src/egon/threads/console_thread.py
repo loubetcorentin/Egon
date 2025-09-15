@@ -1,5 +1,5 @@
-from modules.short_term_memory import ShortTermMem
-from modules.emotional_state import EmotionalState
+from egon.modules.short_term_memory import ShortTermMem
+from egon.modules.emotional_state import EmotionalState
 
 # from modules.logger import logger
 import random

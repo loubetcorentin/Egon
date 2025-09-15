@@ -1,11 +1,10 @@
 from threading import Thread
 import logging
-from threads.vision_thread import vision_thread
-from threads.brain_thread import brain_thread
-from threads.console_thread import console_thread
-from threads.forgetting_thread import fogetting_thread
-from modules.short_term_memory import ShortTermMem
-import time
+from egon.threads.vision_thread import vision_thread
+from egon.threads.brain_thread import brain_thread
+from egon.threads.console_thread import console_thread
+from egon.threads.forgetting_thread import fogetting_thread
+
 
 logging.basicConfig(level=logging.INFO)
 

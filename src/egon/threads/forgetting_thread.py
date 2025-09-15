@@ -1,5 +1,5 @@
-from modules.short_term_memory import ShortTermMem
-from modules.logger import logger
+from egon.modules.short_term_memory import ShortTermMem
+from egon.modules.logger import logger
 # from modules.logger import logger
 import random
 import time

@@ -5,6 +5,7 @@ description = ""
 authors = [
     {name = "NicolasAudepin",email = "42012602+NicolasAudepin@users.noreply.github.com"}
 ]
+# packages = [{ include = "egon" }]
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

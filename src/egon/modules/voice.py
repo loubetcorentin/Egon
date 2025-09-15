@@ -8,7 +8,7 @@ I used the pygame library to play the sounds. Probably overkill but better than 
 
 from pygame.mixer import Sound, init
 import torch
-from modules.logger import logger
+from egon.modules.logger import logger
 import os.path
 
 import random

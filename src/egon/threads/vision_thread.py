@@ -1,7 +1,6 @@
 import cv2
-from modules.short_term_memory import ShortTermMem
-import mediapipe as mp
-from modules.logger import logger
+from egon.modules.short_term_memory import ShortTermMem
+from egon.modules.logger import logger
 import mediapipe.python.solutions.hands as mphands
 import mediapipe.python.solutions.face_detection as mpface
 from google.protobuf.json_format import MessageToDict
@@ -45,10 +44,11 @@ def vision_thread():
         
         match model_turn%2:
             case 0:
-                break
+                
                 run_hand_detection(img)
         
             case 1:
+                break
                 run_face_detection(img)
         
 

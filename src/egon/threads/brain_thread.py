@@ -2,10 +2,11 @@
 It links the outputs of the sensors in the Short Term Memory to the emotional state and actions.
 """
 
-from modules.short_term_memory import ShortTermMem
-from modules.emotional_state import EmotionalState
-from modules.voice import Voice, get_excited_ono , get_bored_ono
-from modules.logger import logger
+from egon.modules.short_term_memory import ShortTermMem
+from egon.modules.emotional_state import EmotionalState
+from egon.modules.voice import Voice, get_excited_ono , get_bored_ono
+from egon.modules.motor_control import Neck, act_no
+from egon.modules.logger import logger
 from time import sleep
 from random import randint
 
@@ -23,6 +24,7 @@ def brain_thread():
                 if randint(0, 100) < 30:
                     brain.drink_coffe()
                     Voice.say("aah coffee. What a treat")
+                    act_no()
 
             case brain.searching:
                 if ShortTermMem.get_vision_output():
