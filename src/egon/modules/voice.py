@@ -56,7 +56,6 @@ class Voice:
         cls.play_wav(audio_path)
 
 
-Voice.init_voice()
 
 
 def get_excited_ono():

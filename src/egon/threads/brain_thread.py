@@ -2,49 +2,75 @@
 It links the outputs of the sensors in the Short Term Memory to the emotional state and actions.
 """
 
-from egon.modules.short_term_memory import ShortTermMem
+from egon.modules.memory import ShortTermMem, LongTermMem
 from egon.modules.emotional_state import EmotionalState
-from egon.modules.voice import Voice, get_excited_ono , get_bored_ono
-from egon.modules.motor_control import Neck, act_no
+from egon.modules.voice import Voice, get_excited_ono, get_bored_ono
+from egon.modules.motor_control import Neck
 from egon.modules.logger import logger
 from time import sleep
-from random import randint
+from random import randint, sample
+
+
+BRAIN = EmotionalState.SM
+
+
+def do_I_like(key):
+    long_mem = LongTermMem.get_long_term_mem()
+
+    if key in long_mem:
+        # bad ending
+        logger.info("nul")
+        BRAIN.get_disapointed()
+        ono = get_bored_ono()
+        Voice.say(ono)
+    else:
+        # new this is good
+        logger.info("coool")
+        LongTermMem.add(key)
+        BRAIN.get_excited()
+        ono = get_excited_ono()
+        Voice.say(ono)
+
+
+def search():
+    mem = ShortTermMem.get_short_term_mem()
+
+    # someone is there
+    if "face" in mem.keys() and mem["face"] > 20:
+        selected_key = sample(sorted(mem.keys()), 1)[0]
+        if mem[selected_key] > 20:
+            do_I_like(selected_key)
 
 
 def brain_thread():
 
-    brain = EmotionalState.SM
+    Voice.init_voice()
+    Neck.init_neck()
 
     while True:
         sleep(0.4)
-        # logger.info(f"🧠 {brain.current_state}")
+        # logger.info(f"🧠 {BRAIN.current_state}")
 
-        match brain.current_state:
-            case brain.waking:
+        match BRAIN.current_state:
+            case BRAIN.waking:
                 if randint(0, 100) < 30:
-                    brain.drink_coffe()
+                    BRAIN.drink_coffe()
                     Voice.say("aah coffee. What a treat")
-                    act_no()
+                    Neck.act_no()
 
-            case brain.searching:
-                if ShortTermMem.get_vision_output():
-                    # Voice.say("oh")
-                    ono = get_excited_ono()
-                    Voice.say(ono)
-                    brain.see_someone()
-                else:
-                    if randint(0, 100) < 30:
-                        pass
+            case BRAIN.searching:
 
-            case brain.excited:
+                search()
+
+            case BRAIN.excited:
                 if randint(0, 100) < 15:
-                    ono = get_bored_ono()
-                    Voice.say(ono)
-                    
+
                     # Voice.say("meh")
-                    brain.get_bored()
+                    BRAIN.get_bored()
 
-
+            case BRAIN.disapointed:
+                Neck.act_no()
+                BRAIN.try_again()
 
 
 if __name__ == "__main__":  # for debugging

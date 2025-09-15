@@ -3,21 +3,18 @@ from statemachine import StateMachine, State
 
 class EmotionalJourneySM(StateMachine):
 
-    #states
+    # states
     waking = State("waking", initial=True)
-    searching = State(
-        "searching",
-    )
-    excited = State(
-        "excited",
-    )
+    searching = State("searching")
+    excited = State("excited")
+    disapointed = State("disapointed")
 
-    #transitions
+    # transitions
     drink_coffe = waking.to(searching)
-    see_someone = searching.to(excited)
+    get_excited = searching.to(excited)
+    get_disapointed = searching.to(disapointed)
+    try_again  = disapointed.to(searching)
     get_bored = excited.to(searching)
-    
-    
 
 
 class EmotionalState:

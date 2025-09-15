@@ -1,5 +1,5 @@
 import cv2
-from egon.modules.short_term_memory import ShortTermMem
+from egon.modules.memory import ShortTermMem
 from egon.modules.logger import logger
 import mediapipe.python.solutions.hands as mphands
 import mediapipe.python.solutions.face_detection as mpface
@@ -12,45 +12,50 @@ model_face = mpface.FaceDetection()
 def run_hand_detection(img):
     res = model_hands.process(img)
     # logger.info(res.multi_hand_landmarks)
-    logger.info(res.detections)
-    # if res.multi_handedness:
-    #     output = [
-    #         MessageToDict(c)["classification"][0]["label"]
-    #         for c in res.multi_handedness
-    #     ]
-    #     logger.info(res.multi_handedness)
-    #     ShortTermMem.set_vision_output(output)
-    
+    # logger.info(res.multi_handedness)
+    if res.multi_handedness:
+        output = [
+            MessageToDict(c)["classification"][0]["label"] for c in res.multi_handedness
+        ]
+        # logger.info(output)
+        for h in output:
+            ShortTermMem.add(key=f"hand {h}")
+
+
 def run_face_detection(img):
     res = model_face.process(img)
     # logger.info(res.multi_hand_landmarks)
-    if res.multi_handedness:
+    if res.detections:
         output = [
-            MessageToDict(c)["classification"][0]["label"]
-            for c in res.multi_handedness
+            {
+                d.label_id[0],
+                d.score[0],
+                d.location_data.relative_bounding_box.xmin,
+                # d.location_data.relative_bounding_box.ymin,
+                # d.location_data.relative_bounding_box.width,
+                # d.location_data.relative_bounding_box.height,
+            }
+            for d in res.detections
         ]
-        logger.info(res.multi_handedness)
-        ShortTermMem.set_vision_output(output)
-    
+        # logger.info(output)
+        for f in output:
+            ShortTermMem.add(key="face")
+
 
 def vision_thread():
     cap = cv2.VideoCapture(0)
     has_img, img = cap.read()
-    model_turn = 0 # we alternate which model is predicting at each frame
-    
+    model_turn = 0  # we alternate which model is predicting at each frame
+
     while has_img:
-        model_turn+=1
+        model_turn += 1
         has_img, img = cap.read()
-        
-        match model_turn%2:
+
+        match model_turn % 2:
             case 0:
-                
                 run_hand_detection(img)
-        
             case 1:
-                break
                 run_face_detection(img)
-        
 
         cv2.imshow("poulet", img)
         # ShortTermMem.set_vision_output(output)

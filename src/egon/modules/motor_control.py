@@ -33,7 +33,7 @@ class BufferServo:
 
     def set_goal(self, value=90):
         self._goal_value = max(min(180, value), 0)
-        logger.info(self._goal_value)
+        # logger.info(self._goal_value)
 
     def set_speed(self, value=1):
         self._speed_ratio = max(min(1, value), 0)
@@ -44,6 +44,8 @@ class BufferServo:
 
 class Neck:
 
+    BS = None
+
     @classmethod
     def init_neck(cls):
         logger.info("🦿🙃🦿 neck init")
@@ -52,6 +54,17 @@ class Neck:
         cls.pin = cls.board.get_pin("d:9:s")
         cls.BS = BufferServo(cls.pin)
         logger.info("[#55FF88][r]🦿🙃🦿 succesful [/r][/#55FF88]")
+
+    @classmethod
+    def read_pos(cls):
+        if cls.BS is not None:
+            return {
+                "goal": cls.BS._goal_value,
+                "current": cls.BS.current_value,
+                "speed": cls.BS._speed_ratio,
+            }
+        else:
+            return {"nothing yet": -1}
 
     @classmethod
     def move_to(cls, angle, speed_ratio=1):
@@ -90,6 +103,3 @@ class Neck:
         cls.move_by(-40, speed_ratio=0.4)
         time.sleep(0.2)
         cls.move_by(20, speed_ratio=0.4)
-
-
-Neck.init_neck()
