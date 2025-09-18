@@ -37,6 +37,12 @@ class ShortTermMem:
                 else:
                     cls.mem.pop(key)
 
+    @classmethod
+    def remove(cls, key):
+        with cls.mem_lock:
+            if key in cls.mem.keys():
+                cls.mem.pop(key)
+
 
 class LongTermMem:
     mem = dict()

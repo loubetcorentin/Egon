@@ -27,6 +27,7 @@ def do_I_like(key):
         # new this is good
         logger.info("coool")
         LongTermMem.add(key)
+        ShortTermMem.remove(key)
         BRAIN.get_excited()
         ono = get_excited_ono()
         Voice.say(ono)
