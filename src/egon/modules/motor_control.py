@@ -2,6 +2,7 @@ from egon.modules.logger import logger
 import threading
 import pyfirmata2
 import time
+from egon.modules.console_utils import ConsoleTable
 
 
 class BufferServo:
@@ -47,24 +48,25 @@ class Neck:
     BS = None
 
     @classmethod
+    def update_table(cls):
+        if cls.BS is not None:
+            return {
+                "goal": f"{cls.BS._goal_value:.02f}",
+                "current": f"{cls.BS.current_value:.02f}",
+                "speed": f"{cls.BS._speed_ratio:.02f}",
+            }
+        else:
+            return {"nothing yet": "nada"}
+
+    @classmethod
     def init_neck(cls):
         logger.info("🦿🙃🦿 neck init")
         cls.PORT = pyfirmata2.Arduino.AUTODETECT
         cls.board = pyfirmata2.Arduino(cls.PORT)
         cls.pin = cls.board.get_pin("d:9:s")
         cls.BS = BufferServo(cls.pin)
+        CT = ConsoleTable("🦿🙃🦿 Neck", cls.update_table, index=4)
         logger.info("[#55FF88][r]🦿🙃🦿 succesful [/r][/#55FF88]")
-
-    @classmethod
-    def read_pos(cls):
-        if cls.BS is not None:
-            return {
-                "goal": cls.BS._goal_value,
-                "current": cls.BS.current_value,
-                "speed": cls.BS._speed_ratio,
-            }
-        else:
-            return {"nothing yet": -1}
 
     @classmethod
     def move_to(cls, angle, speed_ratio=1):

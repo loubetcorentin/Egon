@@ -37,7 +37,7 @@ def search():
     mem = ShortTermMem.get_short_term_mem()
 
     # someone is there
-    if "face" in mem.keys() and mem["face"] > 20:
+    if "person" in mem.keys() and mem["person"] > 20:
         selected_key = sample(sorted(mem.keys()), 1)[0]
         if mem[selected_key] > 20:
             do_I_like(selected_key)
@@ -50,14 +50,17 @@ def brain_thread():
 
     while True:
         sleep(0.4)
-        # logger.info(f"🧠 {BRAIN.current_state}")
 
         match BRAIN.current_state:
             case BRAIN.waking:
-                if randint(0, 100) < 30:
-                    BRAIN.drink_coffe()
-                    Voice.say("aah coffee. What a treat")
-                    Neck.act_no()
+                sleep(1)
+                Voice.say("I'M UP BITCH")
+                Neck.act_no()
+                BRAIN.drink_coffe()
+                # if randint(0, 100) < 30:
+                #     BRAIN.drink_coffe()
+                #     Voice.say("aah coffee. What a treat")
+                #     Neck.act_no()
 
             case BRAIN.searching:
 

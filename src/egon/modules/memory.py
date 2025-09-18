@@ -1,6 +1,7 @@
 from threading import Lock
 import logging
 from enum import Enum
+from egon.modules.console_utils import ConsoleTable
 
 
 class ShortTermMem:
@@ -44,6 +45,17 @@ class ShortTermMem:
                 cls.mem.pop(key)
 
 
+def update_table_short():
+    mem = ShortTermMem.get_short_term_mem()
+    d = dict()
+    for k, v in mem.items():
+        d[k] = f"{v:3d}"
+    return d
+
+
+table = ConsoleTable("🐒🐒 Short Mem", update_table_short, index=2)
+
+
 class LongTermMem:
     mem = dict()
     mem_lock = Lock()
@@ -73,3 +85,11 @@ class LongTermMem:
         with cls.mem_lock:
             x = cls.mem
         return x
+
+def update_table_long():
+    mem = LongTermMem.get_long_term_mem()
+    d = dict()
+    for k, v in mem.items():
+        d[k] = f"{v:3d}"
+    return d
+table = ConsoleTable("🦧🦧 Long Mem", update_callback=update_table_long, index=3)

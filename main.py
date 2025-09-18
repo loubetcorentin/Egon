@@ -3,12 +3,16 @@ import logging
 from egon.threads.vision_thread import vision_thread
 from egon.threads.brain_thread import brain_thread
 from egon.threads.console_thread import console_thread
+from egon.modules.console_utils import ConsoleTable
 from egon.threads.forgetting_thread import fogetting_thread
-
+import time
 
 logging.basicConfig(level=logging.INFO)
 
 if __name__ == "__main__":
+
+    main_table = ConsoleTable("🥚", index=0)
+    main_table.d["start"] = time.asctime()
 
     threads_func = [
         vision_thread,
@@ -24,6 +28,6 @@ if __name__ == "__main__":
     # all other threads are killed when this scrip end. So w keep it running until killing manually with ctrl+C
     try:
         while True:
-            pass
+            main_table.d["now"] = time.asctime()
     except KeyboardInterrupt:
         pass
