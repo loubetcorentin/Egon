@@ -92,7 +92,7 @@ def run_face_detection(img):
 
 def vision_thread():
 
-    ct = ConsoleTable("👁️👁️", index=5)
+    ct = ConsoleTable("👁️ 👁️", index=5)
     fps_avg_frame_count = 10
 
     model_obj = ObjectDetectionModel()
@@ -103,6 +103,8 @@ def vision_thread():
 
     while BRAIN.current_state == BRAIN.waking:
         time.sleep(1)
+        
+    logger.info("[#55FF88][r]👁️ start vision [/r][/#55FF88]")
 
     counter = 0
     start_time = time.time()
@@ -117,7 +119,7 @@ def vision_thread():
             end_time = time.time()
             fps = fps_avg_frame_count / (end_time - start_time)
             start_time = time.time()
-            ct.d["FPS"] = f"{fps:.02f}"
+            ct.d["FPS"] = f"{fps: 5.02f}"
 
         rval, img = cap.read()
 

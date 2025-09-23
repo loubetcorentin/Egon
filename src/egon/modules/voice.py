@@ -43,7 +43,7 @@ class Voice:
         Sound(path).play()
 
     @classmethod
-    def shutup(cls, path="test.wav"):
+    def shutup(cls):
         stop()
 
     @classmethod

@@ -51,9 +51,9 @@ class Neck:
     def update_table(cls):
         if cls.BS is not None:
             return {
-                "goal": f"{cls.BS._goal_value:.02f}",
-                "current": f"{cls.BS.current_value:.02f}",
-                "speed": f"{cls.BS._speed_ratio:.02f}",
+                "goal": f"{cls.BS._goal_value: 6.02f}",
+                "current": f"{cls.BS.current_value: 6.02f}",
+                "speed": f"{cls.BS._speed_ratio: 6.02f}",
             }
         else:
             return {"nothing yet": "nada"}
@@ -65,7 +65,6 @@ class Neck:
         cls.board = pyfirmata2.Arduino(cls.PORT)
         cls.pin = cls.board.get_pin("d:9:s")
         cls.BS = BufferServo(cls.pin)
-        CT = ConsoleTable("🦿🙃🦿 Neck", cls.update_table, index=4)
         logger.info("[#55FF88][r]🦿🙃🦿 succesful [/r][/#55FF88]")
 
     @classmethod
@@ -105,3 +104,6 @@ class Neck:
         cls.move_by(-40, speed_ratio=0.4)
         time.sleep(0.2)
         cls.move_by(20, speed_ratio=0.4)
+
+
+CT = ConsoleTable("🦿🙃🦿 Neck", Neck.update_table, index=4)
