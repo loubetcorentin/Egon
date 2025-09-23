@@ -123,7 +123,6 @@ def vision_thread():
 
         model_hand.process(img)
         model_obj.process(img, counter)
-        print(counter)
         img = visualize_detection(img, model_obj.detection_result_list)
         # img = visualize_detection(img, model_obj.detection_result_list)
 
