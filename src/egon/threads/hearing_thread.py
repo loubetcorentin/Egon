@@ -1,0 +1,51 @@
+import time
+from egon.modules.console_utils import ConsoleTable
+from egon.modules.emotional_state import EmotionalState
+from egon.modules.logger import logger
+
+BRAIN = EmotionalState.SM
+from speechbrain.inference.ASR import EncoderASR
+from speechbrain.inference import LocalStrategy
+
+from scipy.io.wavfile import write
+import sounddevice as sd
+
+asr_model = EncoderASR.from_hparams(
+    source="speechbrain/asr-wav2vec2-commonvoice-fr",
+    savedir="models/speechbrainASR",
+    # huggingface_cache_dir="models/speechbrainASR/cache",
+    local_strategy=LocalStrategy.COPY,
+)
+
+
+def hearing_thread():
+
+    ct = ConsoleTable("👂👂", index=7)
+    ct.d["rec"] = "init"
+    logger.debug(ct.d)
+
+    fs = 16000
+    duration = 2
+
+    ct.d["fs"] = f"{fs}"
+    ct.d["duration"] = f"{duration}"
+    ct.d["rec"] = "off"
+    ct.d["heard"] = ""
+    logger.debug(ct.d)
+
+    while BRAIN.current_state == BRAIN.waking and __name__ != "__main__":
+        time.sleep(1)
+
+    ct.d["rec"] = "listening"
+    logger.debug(ct.d)
+    while True:
+        myrecording = sd.rec(int(duration * fs), samplerate=fs, channels=2)
+        sd.wait()  # Wait until recording is finished
+        write("rec.wav", fs, myrecording)  # Save as WAV file
+        res = asr_model.transcribe_file("rec.wav")
+        ct.d["heard"] = f"{ct.d["heard"]} {res}"[-35:]
+        logger.info(res)
+
+
+if __name__ == "__main__":
+    hearing_thread()
