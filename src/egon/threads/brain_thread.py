@@ -23,6 +23,7 @@ def do_I_like(key):
         BRAIN.get_disapointed()
         ono = get_bored_ono()
         Voice.say(ono)
+        sleep(10)
     else:
         # new this is good
         logger.info("coool")

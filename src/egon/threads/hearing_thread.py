@@ -9,12 +9,17 @@ from speechbrain.inference import LocalStrategy
 
 from scipy.io.wavfile import write
 import sounddevice as sd
+import time
+import torch
+
+logger.info(f"torch.cuda.is_available() : {torch.cuda.is_available()}")
 
 asr_model = EncoderASR.from_hparams(
     source="speechbrain/asr-wav2vec2-commonvoice-fr",
     savedir="models/speechbrainASR",
     # huggingface_cache_dir="models/speechbrainASR/cache",
     local_strategy=LocalStrategy.COPY,
+    
 )
 
 
@@ -36,15 +41,20 @@ def hearing_thread():
     while BRAIN.current_state == BRAIN.waking and __name__ != "__main__":
         time.sleep(1)
 
-    ct.d["rec"] = "listening"
     logger.debug(ct.d)
     while True:
-        myrecording = sd.rec(int(duration * fs), samplerate=fs, channels=2)
+        
+        ct.d["rec"] = "listening"
+        live_rec = sd.rec(int(duration * fs), samplerate=fs, channels=2)
         sd.wait()  # Wait until recording is finished
-        write("rec.wav", fs, myrecording)  # Save as WAV file
+        ct.d["rec"] = "infering"
+        start_time = time.time()
+        write("rec.wav", fs, live_rec)  # Save as WAV file
         res = asr_model.transcribe_file("rec.wav")
         ct.d["heard"] = f"{ct.d["heard"]} {res}"[-35:]
-        logger.info(res)
+        logger.info(f"👂🥚👂 : {res}")
+        inference_time = time.time() - start_time
+        ct.d["T inference"] = f"{inference_time: 5.02f}s"
 
 
 if __name__ == "__main__":

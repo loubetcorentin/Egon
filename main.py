@@ -4,7 +4,7 @@ from egon.threads.vision_thread import vision_thread
 from egon.threads.brain_thread import brain_thread
 from egon.threads.console_thread import console_thread
 from egon.modules.console_utils import ConsoleTable
-from egon.threads.forgetting_thread import fogetting_thread
+from egon.threads.forgetting_thread import forgetting_thread
 from egon.threads.hearing_thread import hearing_thread
 import time
 
@@ -19,7 +19,7 @@ if __name__ == "__main__":
         vision_thread,
         brain_thread,
         console_thread,
-        fogetting_thread,
+        forgetting_thread,
         hearing_thread,
     ]
 

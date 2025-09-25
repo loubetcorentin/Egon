@@ -23,11 +23,11 @@ def random_forget():
         logger.debug("🦧 BIG forgot")
 
 
-def fogetting_thread():
+def forgetting_thread():
     while True:
         time.sleep(0.2)
         random_forget()
 
 
 if __name__ == "__main__":  # for debugging
-    fogetting_thread()
+    forgetting_thread()
