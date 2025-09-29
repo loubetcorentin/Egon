@@ -5,6 +5,10 @@ the generation is done using snakers4/silero-models that is downloaded once and 
 Generated voicelines are saved as .wav files in the audio_files folder. That way repeated lines do not need to be generated multiple times.
 I used the pygame library to play the sounds. Probably overkill but better than the other libraries I tried.
 """
+import os
+#print(os.environ['SDL_AUDIODRIVER'])
+#os.environ['SDL_AUDIODRIVER'] = 'dsp'
+
 
 from pygame.mixer import Sound, init, stop
 import torch
@@ -28,7 +32,13 @@ class Voice:
 
     @classmethod
     def init_voice(cls):
-        init()
+        try :
+            init()
+        except Exception as e:
+            logger.error(e)
+            cls.CT.d["pygame"] = "fail"
+        else:
+            cls.CT.d["pygame"] = "running"
 
         cls.MODEL, _ = torch.hub.load(
             repo_or_dir="snakers4/silero-models",
@@ -40,11 +50,25 @@ class Voice:
 
     @classmethod
     def play_wav(cls, path="test.wav"):
-        Sound(path).play()
-
+        try :
+            Sound(path).play()
+        except Exception as e:
+            logger.error(e)
+            cls.CT.d["pygame"] = "play fail"
+        else:
+            cls.CT.d["pygame"] = "playing"
+        
+   
     @classmethod
     def shutup(cls):
-        stop()
+        try :
+            stop()
+        except Exception as e:
+            logger.error(e)
+            cls.CT.d["pygame"] = "stop fail"
+        else:
+            cls.CT.d["pygame"] = "stop"
+        
 
     @classmethod
     def say(cls, str):
@@ -189,3 +213,11 @@ def get_bored_ono():
         text5 = text5 + ("r" * random.randint(5, 10) + " ")
 
     return [text1, text2, text3, text4, text5][random.randint(0, 4)]
+
+
+if __name__ == "__main__":
+    import time
+    Voice.init_voice()
+    for i in range(10):
+        time.sleep(1)
+        Voice.say("Bonj"+"ou"*i+"r")

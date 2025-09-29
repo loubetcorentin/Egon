@@ -6,6 +6,7 @@ from egon.threads.console_thread import console_thread
 from egon.modules.console_utils import ConsoleTable
 from egon.threads.forgetting_thread import forgetting_thread
 from egon.threads.hearing_thread import hearing_thread
+from egon.threads.neck_thread import neck_thread
 import time
 
 logging.basicConfig(level=logging.INFO)
@@ -21,6 +22,7 @@ if __name__ == "__main__":
         console_thread,
         forgetting_thread,
         hearing_thread,
+        neck_thread
     ]
 
     for func in threads_func:

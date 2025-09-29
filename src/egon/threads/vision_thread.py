@@ -88,11 +88,14 @@ def run_face_detection(img):
         # logger.info(output)
         for f in output:
             ShortTermMem.add(key="face")
-
+def preprocess(img):
+    img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+    return img
 
 def vision_thread():
 
     ct = ConsoleTable("👁️ 👁️", index=5)
+    ct.d["."] = "line 96"
     fps_avg_frame_count = 10
 
     model_obj = ObjectDetectionModel()
@@ -101,10 +104,11 @@ def vision_thread():
     cap = cv2.VideoCapture(0)
     cv2.namedWindow("poule")
 
-    while BRAIN.current_state == BRAIN.waking:
+    while False and BRAIN.current_state == BRAIN.waking:
         time.sleep(1)
         
     logger.info("[#55FF88][r]👁️ start vision [/r][/#55FF88]")
+    ct.d["."] = "line 109"
 
     counter = 0
     start_time = time.time()
@@ -122,7 +126,7 @@ def vision_thread():
             ct.d["FPS"] = f"{fps: 5.02f}"
 
         rval, img = cap.read()
-
+        img = preprocess(img)
         model_hand.process(img)
         model_obj.process(img, counter)
         img = visualize_detection(img, model_obj.detection_result_list)

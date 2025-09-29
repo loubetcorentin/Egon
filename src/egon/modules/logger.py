@@ -14,7 +14,10 @@ class RichHandler(
 ):  # uses rich print in console to get access to colors and stuff
     def emit(self, record):
         txt = self.format(record=record)
-        print(txt)
+        if record.levelno == logging.ERROR :
+            print(f"[#CC2222][r]{txt}[/r][/#CC2222]")
+        else:
+            print(txt)
 
 
 class PoorFormater(logging.Formatter):  # removes rich stuff for file log

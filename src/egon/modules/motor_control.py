@@ -47,6 +47,8 @@ class Neck:
 
     BS = None
 
+
+
     @classmethod
     def update_table(cls):
         if cls.BS is not None:
@@ -62,6 +64,9 @@ class Neck:
     def init_neck(cls):
         logger.info("🦿🙃🦿 neck init")
         cls.PORT = pyfirmata2.Arduino.AUTODETECT
+        cls.PORT = "/dev/ttyACM0"
+        logger.info(f"🦿🙃🦿 {cls.PORT}")
+        
         cls.board = pyfirmata2.Arduino(cls.PORT)
         cls.pin = cls.board.get_pin("d:9:s")
         cls.BS = BufferServo(cls.pin)
@@ -78,32 +83,19 @@ class Neck:
         cls.BS.set_goal(cls.BS.current_value + angle)
 
     @classmethod
-    def freeze(cls):
+    def freeze(cls,*args):
         cls.BS.set_speed(1)
         cls.BS.set_goal(cls.BS.current_value)
 
     @classmethod
-    def make_space(cls, angle=10):
+    def make_space(cls, angle=10, speed_ratio=1):
         if cls.BS.current_value < angle:
-            cls.move_to(angle)
+            cls.move_to(angle,speed_ratio)
         elif cls.BS.current_value > 180 - angle:
-            cls.move_to(180 - angle)
+            cls.move_to(180 - angle,speed_ratio)
 
-    @classmethod
-    def act_no(cls):
-        cls.make_space(20)
-        time.sleep(0.2)
-        cls.move_by(-20, speed_ratio=0.4)
-        time.sleep(0.2)
-        cls.move_by(40, speed_ratio=0.4)
-        time.sleep(0.2)
-        cls.move_by(-40, speed_ratio=0.4)
-        time.sleep(0.2)
-        cls.move_by(40, speed_ratio=0.4)
-        time.sleep(0.2)
-        cls.move_by(-40, speed_ratio=0.4)
-        time.sleep(0.2)
-        cls.move_by(20, speed_ratio=0.4)
 
 
 CT = ConsoleTable("🦿🙃🦿 Neck", Neck.update_table, index=4)
+
+

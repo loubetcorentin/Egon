@@ -7,14 +7,14 @@ import time
 
 
 def random_forget():
-    if random.random() < 0.8:
+    if random.random() < 0.95:
 
         mem = ShortTermMem.get_short_term_mem()
         for key in list(mem.keys()):
             ShortTermMem.remove_one(key)
 
         logger.debug("🐒 forgot")
-    if random.random() < 0.1:
+    if random.random() < 0.05:
 
         mem = LongTermMem.get_long_term_mem()
         for key in list(mem.keys()):
