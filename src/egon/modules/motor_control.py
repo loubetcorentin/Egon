@@ -64,7 +64,7 @@ class Neck:
     def init_neck(cls):
         logger.info("🦿🙃🦿 neck init")
         cls.PORT = pyfirmata2.Arduino.AUTODETECT
-        cls.PORT = "/dev/ttyACM0"
+        # cls.PORT = "/dev/ttyACM0"
         logger.info(f"🦿🙃🦿 {cls.PORT}")
         
         cls.board = pyfirmata2.Arduino(cls.PORT)

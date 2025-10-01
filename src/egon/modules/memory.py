@@ -7,6 +7,7 @@ from egon.modules.console_utils import ConsoleTable
 class ShortTermMem:
     mem = dict()
     mem_lock = Lock()
+    max_activation = 40
 
     @classmethod
     def set_short_term_mem(cls, x: dict):
@@ -17,7 +18,7 @@ class ShortTermMem:
     def add(cls, key):
         with cls.mem_lock:
             if key in cls.mem.keys():
-                if cls.mem[key] < 100:
+                if cls.mem[key] < cls.max_activation:
                     cls.mem[key] += 1
             else:
                 cls.mem[key] = 1

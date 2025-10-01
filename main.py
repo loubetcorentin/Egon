@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 if __name__ == "__main__":
 
     main_table = ConsoleTable("🥚", index=0)
-    main_table.d["start"] = time.asctime()
+    main_table.d["start"] = time.strftime("%x %X", time.localtime())
 
     threads_func = [
         vision_thread,
@@ -22,16 +22,22 @@ if __name__ == "__main__":
         console_thread,
         forgetting_thread,
         hearing_thread,
-        neck_thread
+        neck_thread,
     ]
 
+    thread_list: list[Thread] = []
     for func in threads_func:
         t = Thread(target=func, daemon=True)
         t.start()
+        thread_list.append(t)
 
     # all other threads are killed when this scrip end. So w keep it running until killing manually with ctrl+C
     try:
         while True:
-            main_table.d["now"] = time.asctime()
+            main_table.d["now"] = time.strftime("%x %X", time.localtime())
+            for t in thread_list:
+                alive = t.is_alive()
+                func = t.name
+                main_table.d[func.split("-")[1]] = "💚" if alive else "💀"
     except KeyboardInterrupt:
         pass

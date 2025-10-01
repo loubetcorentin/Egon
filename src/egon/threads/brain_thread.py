@@ -8,26 +8,32 @@ from egon.modules.voice import Voice, get_excited_ono, get_bored_ono
 from egon.modules.motor_control import Neck
 from egon.modules.logger import logger
 from time import sleep
-from random import randint, sample
+from random import randint, sample, choice
+
+from egon.modules.console_utils import ConsoleTable
+
+CT = ConsoleTable("🧠brain🧠", index=9)
 
 
-
-
-def do_I_like(key):
+def do_I_like_something(stuff_seen):
     long_mem = LongTermMem.get_long_term_mem()
-
-    if key in long_mem:
+    new_thing = None
+    for key in stuff_seen:
+        if key not in long_mem:
+            new_thing = key
+            break
+    if new_thing is None:
         # bad ending
-        logger.info("nul")
+        logger.info("old stuff disapointed")
         BRAIN.get_disapointed()
         ono = get_bored_ono()
         Voice.say(ono)
         sleep(10)
     else:
         # new this is good
-        logger.info("coool")
-        LongTermMem.add(key)
-        ShortTermMem.remove(key)
+        logger.info("new stuff gets exited")
+        LongTermMem.add(new_thing)
+        ShortTermMem.remove(new_thing)
         BRAIN.get_excited()
         ono = get_excited_ono()
         Voice.say(ono)
@@ -37,16 +43,28 @@ def search():
     mem = ShortTermMem.get_short_term_mem()
 
     # someone is there
-    if "person" in mem.keys() and mem["person"] > 20:
-        selected_key = sample(sorted(mem.keys()), 1)[0]
-        if mem[selected_key] > 20:
-            do_I_like(selected_key)
+    if (
+        "person" in mem.keys() and mem["person"] > 10
+    ):  # only think when people are present
+        stuff_seen = set(mem.keys())
+        stuff_seen.remove("person")
+        for key in list(mem.keys()):
+            if mem[key] < 10:
+                stuff_seen.remove(key)  # remove object below a certainty treshold
+        CT.d["seen"] = f"{stuff_seen}"
+
+        if len(stuff_seen) == 0:
+            return  # found nothing. continue search.
+
+        do_I_like_something(stuff_seen)
 
 
 def brain_thread():
 
     Voice.init_voice()
 
+    disapointment_buffer = False
+    CT.d["disa buff"] = f"{disapointment_buffer}"
 
     while True:
         sleep(0.4)
@@ -54,29 +72,31 @@ def brain_thread():
         match BRAIN.SM.current_state:
             case BRAIN.SM.waking:
                 sleep(1)
-                Voice.say("I'M UP BITCH")
+                Voice.say("BOOOONJOUUUUUUUR!!!!! ")
                 # Neck.act_no()
                 BRAIN.drink_coffe()
-                
+
                 # if randint(0, 100) < 30:
                 #     BRAIN.drink_coffe()
                 #     Voice.say("aah coffee. What a treat")
                 #     Neck.act_no()
 
             case BRAIN.SM.searching:
+                if disapointment_buffer:
+                    disapointment_buffer = False
+                    sleep(randint(5, 10))
 
                 search()
 
             case BRAIN.SM.excited:
-                sleep(2)
+                BRAIN.has_finished_acting.wait()
                 if randint(0, 100) < 15:
 
-                    # Voice.say("meh")
                     BRAIN.get_bored()
 
             case BRAIN.SM.disapointed:
-                sleep(5)
-                # Neck.act_no()
+                BRAIN.has_finished_acting.wait()
+                disapointment_buffer = True
                 BRAIN.try_again()
 
 
@@ -92,6 +112,5 @@ if __name__ == "__main__":  # for debugging
             BRAIN.try_again,
             BRAIN.get_bored,
         ]
-        i = randint(0,len(fns))
+        i = randint(0, len(fns))
         fns[i]()
-

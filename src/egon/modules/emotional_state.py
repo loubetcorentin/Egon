@@ -4,6 +4,7 @@ from threading import Event
 
 
 event_new_state = Event()
+event_finished_acting = Event()
 
 def callback_change():
     event_new_state.set()
@@ -28,6 +29,7 @@ class EmotionalJourneySM(StateMachine):
 
 class EmotionalState:
     is_updated = event_new_state
+    has_finished_acting = event_finished_acting
     SM = EmotionalJourneySM()
 
 
@@ -51,6 +53,6 @@ def update_brain_ct():
         "Emotional State": f"{str(EmotionalState.SM.current_state):^15}",
     }
 
-CT = ConsoleTable("🧠🧠🧠🧠 brain", update_brain_ct, index=1)
+CT = ConsoleTable("emotion", update_brain_ct, index=1)
 
 
