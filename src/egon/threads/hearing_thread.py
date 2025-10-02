@@ -13,15 +13,7 @@ import sounddevice as sd
 import time
 import torch
 
-logger.info(f"torch.cuda.is_available() : {torch.cuda.is_available()}")
 
-asr_model = EncoderASR.from_hparams(
-    source="speechbrain/asr-wav2vec2-commonvoice-fr",
-    savedir="models/speechbrainASR",
-    # huggingface_cache_dir="models/speechbrainASR/cache",
-    local_strategy=LocalStrategy.COPY,
-    
-)
 
 def detects_nice_word(txt:str):
     heard_words = txt.lower().split(" ")
@@ -31,6 +23,16 @@ def detects_nice_word(txt:str):
     
 
 def hearing_thread():
+    
+    logger.info(f"torch.cuda.is_available() : {torch.cuda.is_available()}")
+
+    asr_model = EncoderASR.from_hparams(
+        source="speechbrain/asr-wav2vec2-commonvoice-fr",
+        savedir="models/speechbrainASR",
+        # huggingface_cache_dir="models/speechbrainASR/cache",
+        local_strategy=LocalStrategy.COPY,
+        
+    )
 
     ct = ConsoleTable("👂👂", index=7)
     ct.d["rec"] = "init"

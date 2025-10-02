@@ -3,7 +3,7 @@ from egon.modules.motor_control import Neck
 from egon.modules.console_utils import ConsoleTable
 from egon.modules.logger import logger
 from threading import Event, Timer
-
+from egon.modules.memory import CrowdPosition
 next_now = Event()
 
 steps_search = [
@@ -79,7 +79,7 @@ def neck_thread():
     CT = ConsoleTable("neck thread", index=8)
 
     def queue_act(state, current_act: list):
-        logger.info(f'motor queue {str(state)}')
+        logger.info(f"motor queue {str(state)}")
         CT.d["state"] = f"{str(state):^15}"
 
         current_act.clear()
@@ -93,24 +93,32 @@ def neck_thread():
 
     while True:
 
-        CT.d["nextnow"] = f"{next_now.is_set()}"
-        CT.d["brain update"] = f"{BRAIN.is_updated.is_set()}"
-        CT.d["current act len"] = f"{len(current_act)}"
-        if BRAIN.is_updated.is_set():  # brain thread ahs changed emotional state
-            current_state = BRAIN.SM.current_state
-            BRAIN.is_updated.clear()
-            queue_act(current_state, current_act)
-
-        if len(current_act) == 0:  # the current act is finished
-            BRAIN.has_finished_acting.set()
-            BRAIN.is_updated.wait()
-
-        else:
-
-            move = current_act.pop(0)
-            if move == "repeat":
-                queue_act(current_state, current_act)
+        if CrowdPosition.has_public():
+            angle = CrowdPosition.get_delta_rot()
+            if abs(angle) < 20:
+                
+                Neck.move_by(angle, 0.3)
             else:
-                CT.d["move"] = f"{move}"
-                CT.d["nextnow"] = f"{next_now.is_set()}"
-                play_movement(move)
+                Neck.move_by(angle)
+
+        # CT.d["nextnow"] = f"{next_now.is_set()}"
+        # CT.d["brain update"] = f"{BRAIN.is_updated.is_set()}"
+        # CT.d["current act len"] = f"{len(current_act)}"
+        # if BRAIN.is_updated.is_set():  # brain thread ahs changed emotional state
+        #     current_state = BRAIN.SM.current_state
+        #     BRAIN.is_updated.clear()
+        #     queue_act(current_state, current_act)
+
+        # if len(current_act) == 0:  # the current act is finished
+        #     BRAIN.has_finished_acting.set()
+        #     BRAIN.is_updated.wait()
+
+        # else:
+
+        #     move = current_act.pop(0)
+        #     if move == "repeat":
+        #         queue_act(current_state, current_act)
+        #     else:
+        #         CT.d["move"] = f"{move}"
+        #         CT.d["nextnow"] = f"{next_now.is_set()}"
+        #         play_movement(move)

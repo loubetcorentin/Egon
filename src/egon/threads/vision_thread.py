@@ -1,5 +1,5 @@
 import cv2
-from egon.modules.memory import ShortTermMem
+from egon.modules.memory import ShortTermMem, CrowdPosition
 from egon.modules.logger import logger
 import mediapipe.python.solutions.hands as mphands
 import mediapipe.python.solutions.face_detection as mpface
@@ -48,8 +48,18 @@ class ObjectDetectionModel:
         ):
             result.timestamp_ms = timestamp_ms
             self.detection_result_list.append(result)
+            people_detections = []
+
             for detection in result.detections:
-                ShortTermMem.add(detection.categories[0].category_name)
+                cat_name = detection.categories[0].category_name
+                ShortTermMem.add(cat_name)
+                if cat_name == "person":
+                    people_detections.append(detection.bounding_box)
+
+            with CrowdPosition.lock:
+                CrowdPosition.bb_list = people_detections
+                CrowdPosition.img_width = output_image.width
+            logger.info(f"DELTA rot {CrowdPosition.get_delta_rot()}")
 
         model_file = open(ec.path_obj_detection, "rb")
         buff = model_file.read()
@@ -88,9 +98,12 @@ def run_face_detection(img):
         # logger.info(output)
         for f in output:
             ShortTermMem.add(key="face")
+
+
 def preprocess(img):
     img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
     return img
+
 
 def vision_thread():
 
@@ -106,7 +119,7 @@ def vision_thread():
 
     while False and BRAIN.current_state == BRAIN.waking:
         time.sleep(1)
-        
+
     logger.info("[#55FF88][r]👁️ start vision [/r][/#55FF88]")
     ct.d["."] = "line 109"
 

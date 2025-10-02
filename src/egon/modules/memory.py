@@ -15,7 +15,7 @@ class ShortTermMem:
             cls.mem = x
 
     @classmethod
-    def add(cls, key,value=1):
+    def add(cls, key, value=1):
         with cls.mem_lock:
             if key in cls.mem.keys():
                 if cls.mem[key] < cls.max_activation:
@@ -87,10 +87,45 @@ class LongTermMem:
             x = cls.mem
         return x
 
+
 def update_table_long():
     mem = LongTermMem.get_long_term_mem()
     d = dict()
     for k, v in mem.items():
         d[k] = f"{v:3d}"
     return d
+
+
 table = ConsoleTable("🦧🦧 Long Mem", update_callback=update_table_long, index=3)
+
+
+class CrowdPosition:
+    lock = Lock()
+    bb_list = []
+
+    img_width = 100
+    ratio_px2deg = 0.2
+
+    @classmethod
+    def _average_pos(cls):
+        with cls.lock:
+            if not cls.has_public():
+                return cls.img_width / 2
+            avg = 0
+            for bb in cls.bb_list:
+                x_center = bb.origin_x + bb.width / 2
+                avg += x_center
+            avg /= len(cls.bb_list)
+
+        return avg
+
+    @classmethod
+    def has_public(cls):
+        return len(cls.bb_list) != 0
+
+    @classmethod
+    def get_delta_rot(cls):
+        if len(cls.bb_list) == 0:
+            return 0
+        else:
+            return (cls._average_pos() - cls.img_width / 2) * cls.ratio_px2deg * -1
