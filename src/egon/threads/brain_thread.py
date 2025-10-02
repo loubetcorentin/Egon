@@ -36,7 +36,8 @@ def do_I_like_something(stuff_seen):
         ShortTermMem.remove(new_thing)
         BRAIN.get_excited()
         ono = get_excited_ono()
-        Voice.say(ono)
+        # Voice.say(ono)
+        Voice.say(new_thing)
 
 
 def search():

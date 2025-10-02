@@ -15,13 +15,13 @@ class ShortTermMem:
             cls.mem = x
 
     @classmethod
-    def add(cls, key):
+    def add(cls, key,value=1):
         with cls.mem_lock:
             if key in cls.mem.keys():
                 if cls.mem[key] < cls.max_activation:
-                    cls.mem[key] += 1
+                    cls.mem[key] += value
             else:
-                cls.mem[key] = 1
+                cls.mem[key] = value
 
     @classmethod
     def get_short_term_mem(cls):

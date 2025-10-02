@@ -1,8 +1,9 @@
 import time
 from egon.modules.console_utils import ConsoleTable
 from egon.modules.emotional_state import EmotionalState
+from egon.modules.memory import ShortTermMem
 from egon.modules.logger import logger
-
+from egon.config import keyword_list
 BRAIN = EmotionalState.SM
 from speechbrain.inference.ASR import EncoderASR
 from speechbrain.inference import LocalStrategy
@@ -22,6 +23,12 @@ asr_model = EncoderASR.from_hparams(
     
 )
 
+def detects_nice_word(txt:str):
+    heard_words = txt.lower().split(" ")
+    for word in heard_words:
+        if word in keyword_list:
+            return word
+    
 
 def hearing_thread():
 
@@ -53,6 +60,12 @@ def hearing_thread():
         res = asr_model.transcribe_file("rec.wav")
         ct.d["heard"] = f"{ct.d["heard"]} {res}"[-35:]
         logger.info(f"👂🥚👂 : {res}")
+
+        nice_word = detects_nice_word(res)
+        if nice_word:
+            logger.info(f"👂 [#11CC44][r]{nice_word}[/r][/#11CC44]")
+            ShortTermMem.add(nice_word,ShortTermMem.max_activation)
+
         inference_time = time.time() - start_time
         ct.d["T inference"] = f"{inference_time: 5.02f}s"
 

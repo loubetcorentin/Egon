@@ -1,8 +1,7 @@
 from egon.modules.emotional_state import EmotionalState as BRAIN
 from egon.modules.motor_control import Neck
-from time import sleep
 from egon.modules.console_utils import ConsoleTable
-
+from egon.modules.logger import logger
 from threading import Event, Timer
 
 next_now = Event()
@@ -80,6 +79,7 @@ def neck_thread():
     CT = ConsoleTable("neck thread", index=8)
 
     def queue_act(state, current_act: list):
+        logger.info(f'motor queue {str(state)}')
         CT.d["state"] = f"{str(state):^15}"
 
         current_act.clear()
@@ -112,4 +112,5 @@ def neck_thread():
                 queue_act(current_state, current_act)
             else:
                 CT.d["move"] = f"{move}"
+                CT.d["nextnow"] = f"{next_now.is_set()}"
                 play_movement(move)
