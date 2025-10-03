@@ -68,7 +68,7 @@ def brain_thread():
     CT.d["disa buff"] = f"{disapointment_buffer}"
 
     while True:
-        sleep(0.4)
+        sleep(0.1)
 
         match BRAIN.SM.current_state:
             case BRAIN.SM.waking:
@@ -77,10 +77,6 @@ def brain_thread():
                 # Neck.act_no()
                 BRAIN.drink_coffe()
 
-                # if randint(0, 100) < 30:
-                #     BRAIN.drink_coffe()
-                #     Voice.say("aah coffee. What a treat")
-                #     Neck.act_no()
 
             case BRAIN.SM.searching:
                 if disapointment_buffer:
@@ -90,13 +86,13 @@ def brain_thread():
                 search()
 
             case BRAIN.SM.excited:
-                BRAIN.has_finished_acting.wait()
+                BRAIN.has_finished_acting.wait(timeout=6)
                 if randint(0, 100) < 15:
 
                     BRAIN.get_bored()
 
             case BRAIN.SM.disapointed:
-                BRAIN.has_finished_acting.wait()
+                BRAIN.has_finished_acting.wait(timeout=6)
                 disapointment_buffer = True
                 BRAIN.try_again()
 

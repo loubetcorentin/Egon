@@ -59,7 +59,7 @@ class ObjectDetectionModel:
             with CrowdPosition.lock:
                 CrowdPosition.bb_list = people_detections
                 CrowdPosition.img_width = output_image.width
-            logger.info(f"DELTA rot {CrowdPosition.get_delta_rot()}")
+            logger.debug(f"DELTA rot {CrowdPosition.get_delta_rot()}")
 
         model_file = open(ec.path_obj_detection, "rb")
         buff = model_file.read()
@@ -89,9 +89,7 @@ def run_face_detection(img):
                 d.label_id[0],
                 d.score[0],
                 d.location_data.relative_bounding_box.xmin,
-                # d.location_data.relative_bounding_box.ymin,
-                # d.location_data.relative_bounding_box.width,
-                # d.location_data.relative_bounding_box.height,
+
             }
             for d in res.detections
         ]
@@ -113,8 +111,9 @@ def vision_thread():
 
     model_obj = ObjectDetectionModel()
     model_hand = HandModel()
-
+    ct.d["."] = "line 114"
     cap = cv2.VideoCapture(0)
+    ct.d["."] = "line 116"
     cv2.namedWindow("poule")
 
     while False and BRAIN.current_state == BRAIN.waking:
@@ -127,7 +126,8 @@ def vision_thread():
     start_time = time.time()
     rval, frame = cap.read()
 
-    while rval:
+    while True:
+        
         counter += 1
         ct.d["counter"] = f"{counter}"
 
@@ -139,6 +139,7 @@ def vision_thread():
             ct.d["FPS"] = f"{fps: 5.02f}"
 
         rval, img = cap.read()
+    
         img = preprocess(img)
         model_hand.process(img)
         model_obj.process(img, counter)

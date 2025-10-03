@@ -91,34 +91,50 @@ def neck_thread():
     CT.d["state"] = "nothing"
     current_state = None
 
-    while True:
-
+    def look_at_public():
         if CrowdPosition.has_public():
             angle = CrowdPosition.get_delta_rot()
-            if abs(angle) < 20:
-                
-                Neck.move_by(angle, 0.3)
-            else:
-                Neck.move_by(angle)
+            speed = min((abs(angle) /20)**3,1) 
+            
+            CT.d["people deg"] = f"{angle: 3.2f}"
+            CT.d["people speed"] = f"{speed:.2f}"
+            Neck.move_by(angle,speed)
 
-        # CT.d["nextnow"] = f"{next_now.is_set()}"
-        # CT.d["brain update"] = f"{BRAIN.is_updated.is_set()}"
-        # CT.d["current act len"] = f"{len(current_act)}"
-        # if BRAIN.is_updated.is_set():  # brain thread ahs changed emotional state
-        #     current_state = BRAIN.SM.current_state
-        #     BRAIN.is_updated.clear()
-        #     queue_act(current_state, current_act)
+    
 
-        # if len(current_act) == 0:  # the current act is finished
-        #     BRAIN.has_finished_acting.set()
-        #     BRAIN.is_updated.wait()
+    while True:
+        
+        current_state = BRAIN.SM.current_state
+        #CT.d['state'] = current_state
+        #CT.d["nextnow"] = f"{next_now.is_set()}"
+        #CT.d["brain update"] = f"{BRAIN.is_updated.is_set()}"
+        
+        if BRAIN.is_updated.is_set():
+            logger.info(f"brain update {str(current_state)}")
+            BRAIN.is_updated.clear()
+            queue_act(current_state,current_act)
 
-        # else:
+        if next_now.is_set():
+            logger.info("got nextnow")
+        
 
-        #     move = current_act.pop(0)
-        #     if move == "repeat":
-        #         queue_act(current_state, current_act)
-        #     else:
-        #         CT.d["move"] = f"{move}"
-        #         CT.d["nextnow"] = f"{next_now.is_set()}"
-        #         play_movement(move)
+        
+
+        CT.d["current act len"] = f"{len(current_act)}"
+
+
+    
+
+        if len(current_act) == 0:  # the current act is finished
+            BRAIN.has_finished_acting.set()
+            look_at_public() 
+
+        else:
+
+             move = current_act.pop(0)
+             if move == "repeat":
+                 queue_act(current_state, current_act)
+             else:
+                 CT.d["move"] = f"{move}"
+                 CT.d["nextnow"] = f"{next_now.is_set()}"
+                 play_movement(move)

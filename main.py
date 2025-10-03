@@ -21,7 +21,7 @@ if __name__ == "__main__":
         brain_thread,
         console_thread,
         forgetting_thread,
-        # hearing_thread,
+        hearing_thread,
         neck_thread,
     ]
 
