@@ -5,6 +5,7 @@ from threading import Event
 
 event_new_state = Event()
 event_finished_acting = Event()
+next_now = Event()
 
 def callback_change():
     event_new_state.set()
@@ -30,6 +31,7 @@ class EmotionalJourneySM(StateMachine):
 class EmotionalState:
     is_updated = event_new_state
     has_finished_acting = event_finished_acting
+    next_now = next_now
     SM = EmotionalJourneySM()
 
 

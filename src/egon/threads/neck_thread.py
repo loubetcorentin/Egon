@@ -3,8 +3,8 @@ from egon.modules.motor_control import Neck
 from egon.modules.console_utils import ConsoleTable
 from egon.modules.logger import logger
 from threading import Event, Timer
+from time import sleep
 from egon.modules.memory import CrowdPosition
-next_now = Event()
 
 steps_search = [
     ["absolute", 0, 0.2, 8],
@@ -63,78 +63,130 @@ def play_movement(args):
     fn_name, angle, speed_ratio, sleep_time = args
     fn = fn_dict[fn_name]
     fn(angle, speed_ratio)
-    next_now.clear()
-    t = Timer(sleep_time, next_now.set)
+    BRAIN.next_now.clear()
+    t = Timer(sleep_time, BRAIN.next_now.set)
     t.start()
-    next_now.wait()
+    BRAIN.next_now.wait()
     t.cancel()
     # sleep(sleep_time)
 
 
 def neck_thread():
+    CT = ConsoleTable("neck thread", index=8)
 
     Neck.init_neck()
 
-    current_act = [["make_place", 20, 0.2, 1]]
-    CT = ConsoleTable("neck thread", index=8)
 
-    def queue_act(state, current_act: list):
-        logger.info(f"motor queue {str(state)}")
-        CT.d["state"] = f"{str(state):^15}"
 
-        current_act.clear()
-        for step in act_from_state[state]:
-            current_act.append(step)
 
-        next_now.set()
+    current_state = BRAIN.SM.current_state
 
-    CT.d["state"] = "nothing"
-    current_state = None
+    act = "look_at_people"
+    iteration = 0
+
+    
 
     def look_at_public():
         if CrowdPosition.has_public():
             angle = CrowdPosition.get_delta_rot()
-            speed = min((abs(angle) /20)**3,1) 
+            speed = min((abs(angle) /60)**3,1) 
             
-            CT.d["people deg"] = f"{angle: 3.2f}"
-            CT.d["people speed"] = f"{speed:.2f}"
+            # CT.d["people deg"] = f"{angle: 3.2f}"
+            # CT.d["people speed"] = f"{speed:.2f}"
+            # CT.d["look public"] = "[#55FF88]True[/#55FF88]"
+
             Neck.move_by(angle,speed)
 
-    
 
+    to_the_left = True
     while True:
+
         
+        iteration +=1
         current_state = BRAIN.SM.current_state
-        #CT.d['state'] = current_state
-        #CT.d["nextnow"] = f"{next_now.is_set()}"
-        #CT.d["brain update"] = f"{BRAIN.is_updated.is_set()}"
+
+        if to_the_left and Neck.BS.current_value >175:
+            to_the_left = False
+        elif not to_the_left and Neck.BS.current_value < 5:
+            to_the_left = True
         
-        if BRAIN.is_updated.is_set():
-            logger.info(f"brain update {str(current_state)}")
-            BRAIN.is_updated.clear()
-            queue_act(current_state,current_act)
+        if current_state == BRAIN.SM.searching: 
+            if CrowdPosition.has_public() :
+                act = "look_at_people"
+            elif to_the_left:
+                act = "search_left"
+            else: 
+                act = "search_right"     
 
-        if next_now.is_set():
-            logger.info("got nextnow")
-        
+  
 
-        
+        elif current_state == BRAIN.SM.excited:
+            act = "crazzyyy"
+        elif current_state == BRAIN.SM.disapointed:
+            act = "meh"
+        else:
+            act = "nothing"
 
-        CT.d["current act len"] = f"{len(current_act)}"
+            
+
+        CT.d = {
+                "brain state" : str(current_state),
+                "case" : act,
+                "iter" : str(iteration),
+                "to "
+                "nxtnow": "[#55FF88]True[/#55FF88]" if BRAIN.next_now.is_set() else "[#DD3311]False[/#DD3311]"
+            }
+
+        t = Timer(0.4, BRAIN.next_now.set)
+        match act:
+            case "search_left":
+                Neck.move_to(180,0.4)
+                t = Timer(0.1, BRAIN.next_now.set)
+                t.start()
+ 
+                
+            case "search_right":
+                Neck.move_to(0,0.4)
+                t = Timer(0.1, BRAIN.next_now.set)
+                t.start()
 
 
+            case "look_at_people":
+                look_at_public()
+                t = Timer(0.1, BRAIN.next_now.set)
+                t.start()
+
+            case "crazzyyy":
+                Neck.move_to(0,1)
+                sleep(0.2)
+                Neck.move_to(180,1)
+                sleep(0.2)
+                Neck.move_to(0,1)
+                sleep(0.2)
+                Neck.move_to(180,1)
+                sleep(0.2)
+                Neck.move_to(0,1)
+                sleep(0.2)
+                Neck.move_to(180,1)
+                sleep(0.2)
+                BRAIN.next_now.set()
+                BRAIN.has_finished_acting.set()
+            case "meh":
+                if Neck.BS.current_value <90:
+                    Neck.move_by(80,1)
+                else:
+                    Neck.move_by(-80,1)
+
+                sleep(4)
+
+                BRAIN.next_now.set()
+                BRAIN.has_finished_acting.set()
+                
+        BRAIN.next_now.wait(timeout=15)
+        BRAIN.next_now.clear()
+        t.cancel()
     
 
-        if len(current_act) == 0:  # the current act is finished
-            BRAIN.has_finished_acting.set()
-            look_at_public() 
+        
+        
 
-        else:
-
-             move = current_act.pop(0)
-             if move == "repeat":
-                 queue_act(current_state, current_act)
-             else:
-                 CT.d["move"] = f"{move}"
-                 CT.d["nextnow"] = f"{next_now.is_set()}"
-                 play_movement(move)

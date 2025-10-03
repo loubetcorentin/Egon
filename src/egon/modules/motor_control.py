@@ -11,8 +11,8 @@ class BufferServo:
         self.current_value = 0
         self._goal_value = 0
         self.running = True
-        self.max_seconds_per_degree = 0.005
-        self._speed_ratio = 1
+        self.max_seconds_per_degree = 0.002
+        self._speed_ratio = 3
 
         self.th = threading.Thread(target=self.threadloop)
         self.th.start()

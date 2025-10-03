@@ -26,18 +26,20 @@ def do_I_like_something(stuff_seen):
         # bad ending
         logger.info("old stuff disapointed")
         BRAIN.get_disapointed()
+        BRAIN.next_now.set()
         ono = get_bored_ono()
         Voice.say(ono)
-        sleep(10)
+
     else:
         # new this is good
         logger.info("new stuff gets exited")
         LongTermMem.add(new_thing)
         ShortTermMem.remove(new_thing)
         BRAIN.get_excited()
+        BRAIN.next_now.set()
         ono = get_excited_ono()
         # Voice.say(ono)
-        Voice.say(new_thing)
+        Voice.say(new_thing + ono)
 
 
 def search():
@@ -50,7 +52,7 @@ def search():
         stuff_seen = set(mem.keys())
         stuff_seen.remove("person")
         for key in list(mem.keys()):
-            if mem[key] < 10:
+            if mem[key] < 6:
                 stuff_seen.remove(key)  # remove object below a certainty treshold
         CT.d["seen"] = f"{stuff_seen}"
 
@@ -81,12 +83,13 @@ def brain_thread():
             case BRAIN.SM.searching:
                 if disapointment_buffer:
                     disapointment_buffer = False
-                    sleep(randint(5, 10))
+                    sleep(randint(15,20))
 
                 search()
 
             case BRAIN.SM.excited:
                 BRAIN.has_finished_acting.wait(timeout=6)
+                disapointment_buffer = True
                 if randint(0, 100) < 15:
 
                     BRAIN.get_bored()
