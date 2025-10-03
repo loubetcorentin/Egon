@@ -33,11 +33,24 @@ if __name__ == "__main__":
 
     # all other threads are killed when this scrip end. So w keep it running until killing manually with ctrl+C
     try:
+        prev_isalive = dict()
+        for t in thread_list:
+            prev_isalive[t] = True
+
         while True:
-            main_table.d["now"] = time.strftime("%x %X", time.localtime())
+
+            now_str = time.strftime("%x %X", time.localtime())
+            main_table.d["now"] = now_str
             for t in thread_list:
                 alive = t.is_alive()
                 func = t.name
-                main_table.d[func.split("-")[1]] = "💚" if alive else "💀"
+
+                if alive:
+                    main_table.d[func.split("-")[1]] = "💚"
+                else:
+                    if prev_isalive[t]:
+                        main_table.d[func.split("-")[1]] = f"💀 {now_str}"
+                        prev_isalive[t] = False
+
     except KeyboardInterrupt:
         pass
