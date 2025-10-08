@@ -1,0 +1,34 @@
+echo '1-4' | sudo tee /sys/bus/usb/drivers/usb/bind
+echo '1-4' | sudo tee /sys/bus/usb/drivers/usb/unbind
+
+echo '0' | sudo tee /sys/bus/usb/devices/1-4/authorized 
+
+
+echo "0" | sudo tee /sys/bus/usb/devices/1-4/power/autosuspend_delay_ms
+
+
+udevadm info --query=path --name=/dev/video0
+lsusb
+usb-devices
+
+uname -r 
+> 6.14.0-33-generic
+
+uname -a
+
+
+usb-devices  | grep -A 10 05a3
+P:  Vendor=05a3 ProdID=9331 Rev=02.01
+S:  Manufacturer=HD Web Camera
+S:  Product=HD Web Camera
+S:  SerialNumber=Ucamera001
+C:  #Ifs= 4 Cfg#= 1 Atr=c0 MxPwr=500mA
+I:  If#= 0 Alt= 0 #EPs= 1 Cls=0e(video) Sub=01 Prot=00 Driver=(none)
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=16ms
+I:  If#= 1 Alt= 0 #EPs= 0 Cls=0e(video) Sub=02 Prot=00 Driver=(none)
+I:  If#= 2 Alt= 0 #EPs= 0 Cls=01(audio) Sub=01 Prot=00 Driver=snd-usb-audio
+I:  If#= 3 Alt= 0 #EPs= 0 Cls=01(audio) Sub=02 Prot=00 Driver=snd-usb-audio
+
+T:  Bus=01 Lev=01 Prnt=04 Port=03 Cnt=01 Dev#= 10 Spd=480  MxCh= 0
+
+1-1.3 (Bus 1, Port 1.3):

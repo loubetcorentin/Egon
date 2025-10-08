@@ -24,7 +24,7 @@ def do_I_like_something(stuff_seen):
             break
     if new_thing is None:
         # bad ending
-        logger.info("old stuff disapointed")
+        logger.info("🧠 old stuff disapointed")
         BRAIN.get_disapointed()
         BRAIN.next_now.set()
         ono = get_bored_ono()
@@ -32,7 +32,7 @@ def do_I_like_something(stuff_seen):
 
     else:
         # new this is good
-        logger.info("new stuff gets exited")
+        logger.info(f"🧠 {new_thing} is exciting")
         LongTermMem.add(new_thing)
         ShortTermMem.remove(new_thing)
         BRAIN.get_excited()

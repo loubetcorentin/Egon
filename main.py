@@ -1,5 +1,7 @@
 from threading import Thread
 import logging
+from typing import Callable
+from egon.modules.logger import logger
 from egon.threads.vision_thread import vision_thread
 from egon.threads.brain_thread import brain_thread
 from egon.threads.console_thread import console_thread
@@ -10,6 +12,16 @@ from egon.threads.neck_thread import neck_thread
 import time
 
 logging.basicConfig(level=logging.INFO)
+
+prev_isalive = dict()
+thread_list: list[[Thread,Callable]] = []
+
+def start_thread(func):
+    t = Thread(target=func, daemon=True)
+    t.start()
+    logger.info(f"started thread {t}")
+    thread_list.append([t,func])
+    prev_isalive[t] = True
 
 if __name__ == "__main__":
 
@@ -25,32 +37,32 @@ if __name__ == "__main__":
         neck_thread,
     ]
 
-    thread_list: list[Thread] = []
     for func in threads_func:
-        t = Thread(target=func, daemon=True)
-        t.start()
-        thread_list.append(t)
-
-    # all other threads are killed when this scrip end. So w keep it running until killing manually with ctrl+C
+        start_thread(func)
+        
+    
     try:
-        prev_isalive = dict()
-        for t in thread_list:
-            prev_isalive[t] = True
 
-        while True:
+        while True: # all other threads are killed when this scrip end. So w keep it running until killing manually with ctrl+C
 
             now_str = time.strftime("%x %X", time.localtime())
             main_table.d["now"] = now_str
-            for t in thread_list:
+            for t_fn in thread_list.copy():
+                t,fn = t_fn
                 alive = t.is_alive()
-                func = t.name
+                func_name = t.name
 
                 if alive:
-                    main_table.d[func.split("-")[1]] = "💚"
+                    main_table.d[func_name.split("-")[1]] = f"💚 "
                 else:
                     if prev_isalive[t]:
-                        main_table.d[func.split("-")[1]] = f"💀 {now_str}"
+                        main_table.d[func_name.split("-")[1]] = f"💀 {now_str}"
                         prev_isalive[t] = False
+                        logger.warning(f"💀 {t} has just died")
+                        logger.info(f" restarting {t} ")
+
+                        start_thread(fn)
+  
 
     except KeyboardInterrupt:
         pass

@@ -50,7 +50,11 @@ def update_table_short():
     mem = ShortTermMem.get_short_term_mem()
     d = dict()
     for k, v in mem.items():
-        d[k] = f"{v:3d}"
+        if k == "person":
+            d["[#DDBB66][r]person[/r][/#DDBB66]"] = f"{v:3d}"
+        else:
+            d[k] = f"{v:3d}"
+
     return d
 
 

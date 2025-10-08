@@ -5,7 +5,7 @@ I use the Rich library for colored outputs.
 
 import logging
 from rich import print
-
+import traceback
 from rich.text import Text
 
 
@@ -16,8 +16,12 @@ class RichHandler(
         txt = self.format(record=record)
         if record.levelno == logging.ERROR :
             print(f"[#CC2222][r]{txt}[/r][/#CC2222]")
+        elif record.levelno == logging.WARNING :
+            print(f"[#DDEE22][r]{txt}[/r][/#DDEE22]")
         else:
             print(txt)
+
+
 
 
 class PoorFormater(logging.Formatter):  # removes rich stuff for file log
@@ -26,15 +30,25 @@ class PoorFormater(logging.Formatter):  # removes rich stuff for file log
 
 
 class VeryRichFormater(logging.Formatter):
+    def __init__(self, fmt = None, datefmt = None, style = "%", validate = True, *, defaults = None):
+        super().__init__(fmt, datefmt, style, validate, defaults=defaults)
+    
     def formatMessage(self, record):
+
         return super().formatMessage(record)
+    
+    def formatException(self, ei):
+        return 'no'
+        tb_str = ''.join(traceback.format_exception(ei))
+
+        return f"[#992222][r]{tb_str}[/r][/#992222]"
 
 
 file_handler = logging.FileHandler("egon.log", encoding="utf-8", mode="a")
 file_handler.setFormatter(PoorFormater())
 
 console_handler = RichHandler()
-formatter = logging.Formatter(
+formatter = VeryRichFormater(
     "[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s",
     "%m-%d %H:%M:%S",
 )

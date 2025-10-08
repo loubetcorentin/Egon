@@ -23,6 +23,8 @@ def detects_nice_word(txt:str):
     
 
 def hearing_thread():
+    ct = ConsoleTable("👂👂", index=7)
+    ct.d["rec"] = "init"
     
     logger.info(f"torch.cuda.is_available() : {torch.cuda.is_available()}")
 
@@ -30,12 +32,12 @@ def hearing_thread():
         source="speechbrain/asr-wav2vec2-commonvoice-fr",
         savedir="models/speechbrainASR",
         # huggingface_cache_dir="models/speechbrainASR/cache",
-        local_strategy=LocalStrategy.COPY,
+        # local_strategy=LocalStrategy.COPY,
+        local_strategy = LocalStrategy.NO_LINK
         
     )
 
-    ct = ConsoleTable("👂👂", index=7)
-    ct.d["rec"] = "init"
+
     logger.debug(ct.d)
 
     fs = 16000

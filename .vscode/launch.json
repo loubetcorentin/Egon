@@ -14,10 +14,17 @@
       "cwd": "C:\\Users\\nicol\\Documents\\Github\\Egon"
     },
     {
-      "name": "EGON main",
+      "name": "EGON main nico",
       "type": "debugpy",
       "request": "launch",
       "program": "C:\\Users\\nicol\\Documents\\Github\\Egon\\main.py",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "EGON main ZOTAX",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "/home/corentin/Documents/Github/Egon/main.py",
       "console": "integratedTerminal"
     }
   ]

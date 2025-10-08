@@ -4,12 +4,12 @@ from rich.columns import Columns
 
 class ConsoleTableManager:
 
-    table_dict_list = []
+    tables_dict = dict()
 
     @classmethod
     def register(cls, td, index):
-        cls.table_dict_list.insert(index, td)
-        cls.table_dict_list.sort(key=lambda td:td.title[0])
+        cls.tables_dict[f"{index} {td.title}"] = td
+
 
     @classmethod
     def display_table(cls, table):
@@ -23,7 +23,7 @@ class ConsoleTableManager:
 
     @classmethod
     def display(cls):
-        return Columns([cls.display_table(t) for t in cls.table_dict_list])
+        return Columns([cls.display_table(kt[1]) for kt in cls.tables_dict.items()])
 
 
 class ConsoleTable:

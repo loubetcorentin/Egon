@@ -11,7 +11,7 @@ from mediapipe.tasks.python import vision
 import time
 from egon.modules.utils_visual import visualize_detection
 from egon.modules.console_utils import ConsoleTable
-
+from threading import Thread
 model_face = mpface.FaceDetection()
 BRAIN = EmotionalState.SM
 
@@ -102,6 +102,18 @@ def preprocess(img):
     img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
     return img
 
+class VideoCapture:
+    def __init__(self):
+        self.cap = cv2.VideoCapture(0)
+        self.cap.set(cv2.CAP_PROP_BUFFERSIZE,0)
+        self.frame=None
+        t = Thread(self.capture_thread)
+        t.start
+
+    def capture_thread(self):
+        while True:
+            ret, self.frame = self.cap.read() 
+        
 
 def vision_thread():
 
@@ -112,48 +124,59 @@ def vision_thread():
     model_obj = ObjectDetectionModel()
     model_hand = HandModel()
     ct.d["."] = "line 114"
-    cap = cv2.VideoCapture(0)
-    ct.d["."] = "line 116"
-    cv2.namedWindow("poule")
+    cap = VideoCapture()
+    try:
 
-    while False and BRAIN.current_state == BRAIN.waking:
-        time.sleep(1)
-
-    logger.info("[#55FF88][r]👁️ start vision [/r][/#55FF88]")
-    ct.d["."] = "line 109"
-
-    counter = 0
-    start_time = time.time()
-    rval, frame = cap.read()
-
-    while True:
+        ct.d["."] = "line 116"
         
-        counter += 1
-        ct.d["counter"] = f"{counter}"
+        cv2.destroyAllWindows()
+        cv2.namedWindow("poule")
 
-        # Calculate the FPS
-        if counter % fps_avg_frame_count == 0:
-            end_time = time.time()
-            fps = fps_avg_frame_count / (end_time - start_time)
-            start_time = time.time()
-            ct.d["FPS"] = f"{fps: 5.02f}"
+        while False and BRAIN.current_state == BRAIN.waking:
+            time.sleep(1)
 
-        rval, img = cap.read()
+        logger.info("[#55FF88][r]👁️ start vision [/r][/#55FF88]")
+        ct.d["."] = "line 109"
+
+        counter = 0
+        start_time = time.time()
+        frame = cap.read()
+
+        while True:
+            
+            counter += 1
+            ct.d["counter"] = f"{counter}"
+
+            # Calculate the FPS
+            if counter % fps_avg_frame_count == 0:
+                end_time = time.time()
+                fps = fps_avg_frame_count / (end_time - start_time)
+                start_time = time.time()
+                ct.d["FPS"] = f"{fps: 5.02f}"
+
+            img = cap.read()
+        
+            img = preprocess(img)
+            model_hand.process(img)
+            model_obj.process(img, counter)
+            img = visualize_detection(img, model_obj.detection_result_list)
+            # img = visualize_detection(img, model_obj.detection_result_list)
+
+            cv2.imshow("poule", img)
+            model_obj.detection_result_list.clear()
+
+            key = cv2.waitKey(20)
+            if key == 27:  # exit on ESC
+                break
+
+    except Exception as e:
+        logger.info
+        raise e
     
-        img = preprocess(img)
-        model_hand.process(img)
-        model_obj.process(img, counter)
-        img = visualize_detection(img, model_obj.detection_result_list)
-        # img = visualize_detection(img, model_obj.detection_result_list)
-
-        cv2.imshow("poule", img)
-        model_obj.detection_result_list.clear()
-
-        key = cv2.waitKey(20)
-        if key == 27:  # exit on ESC
-            break
-    cap.release()
-    cv2.destroyAllWindows()
+    finally:
+        cap.release()
+        cv2.destroyAllWindows()
+        logger.warning("vison failed")
 
 
 if __name__ == "__main__":
