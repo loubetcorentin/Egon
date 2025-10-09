@@ -103,16 +103,18 @@ def preprocess(img):
     return img
 
 class VideoCapture:
+    def capture_thread(self):
+        while True:
+            ret, self.frame = self.cap.read() 
+
     def __init__(self):
         self.cap = cv2.VideoCapture(0)
         self.cap.set(cv2.CAP_PROP_BUFFERSIZE,0)
         self.frame=None
-        t = Thread(self.capture_thread)
-        t.start
+        t = Thread(target=self.capture_thread)
+        t.start()
 
-    def capture_thread(self):
-        while True:
-            ret, self.frame = self.cap.read() 
+    
         
 
 def vision_thread():
@@ -140,8 +142,10 @@ def vision_thread():
 
         counter = 0
         start_time = time.time()
-        frame = cap.read()
-
+        frame = cap.frame
+        while cap.frame is None:
+            time.sleep(1)
+            logger.info("cap.frame is None => sleep")
         while True:
             
             counter += 1
@@ -154,7 +158,7 @@ def vision_thread():
                 start_time = time.time()
                 ct.d["FPS"] = f"{fps: 5.02f}"
 
-            img = cap.read()
+            img = cap.frame
         
             img = preprocess(img)
             model_hand.process(img)
@@ -174,7 +178,7 @@ def vision_thread():
         raise e
     
     finally:
-        cap.release()
+        cap.cap.release()
         cv2.destroyAllWindows()
         logger.warning("vison failed")
 
