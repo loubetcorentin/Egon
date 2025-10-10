@@ -33,7 +33,7 @@ def hearing_thread():
         savedir="models/speechbrainASR",
         # huggingface_cache_dir="models/speechbrainASR/cache",
         # local_strategy=LocalStrategy.COPY,
-        local_strategy = LocalStrategy.NO_LINK
+        # local_strategy = LocalStrategy.NO_LINK
         
     )
 

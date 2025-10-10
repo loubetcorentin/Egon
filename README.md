@@ -5,6 +5,16 @@ This repo contains the 2025 rework of the Egon codebase.
 ## Env
 We are using a conda env with poetry for the libraries. 
 
+## Install
+install Conda
+```
+conda create -n egon python=3.12 ##### 3.12 !!!! or death
+conda activate egon
+pip install poetry 
+poetry install
+```
+
+
 ## File Structure
 
 main.py: the main file that starts all the threads

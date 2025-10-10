@@ -38,10 +38,9 @@ class HandModel:
 
 
 class ObjectDetectionModel:
-    def __init__(self):
-        self.detection_result_list = []
 
-        def result_callback(
+    def result_callback2(
+            self,
             result: vision.ObjectDetectorResult,
             output_image: mp.Image,
             timestamp_ms: int,
@@ -61,6 +60,11 @@ class ObjectDetectionModel:
                 CrowdPosition.img_width = output_image.width
             logger.debug(f"DELTA rot {CrowdPosition.get_delta_rot()}")
 
+
+    def __init__(self):
+        self.detection_result_list = []
+
+
         model_file = open(ec.path_obj_detection, "rb")
         buff = model_file.read()
         model_file.close()
@@ -68,17 +72,20 @@ class ObjectDetectionModel:
         base_options = python.BaseOptions(model_asset_buffer=buff)
         options = vision.ObjectDetectorOptions(
             base_options=base_options,
-            running_mode=vision.RunningMode.LIVE_STREAM,
+            # running_mode=vision.RunningMode.LIVE_STREAM,
             score_threshold=0.5,
-            result_callback=result_callback,
+            # result_callback=result_callback,
         )
         self.detector = vision.ObjectDetector.create_from_options(options)
 
     def process(self, image, counter):
         rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
-        self.detector.detect_async(mp_image, counter)
-
+        # self.detector.detect_async(mp_image, counter)
+        res = self.detector.detect(mp_image)
+        
+        self.result_callback2(res, output_image=mp_image,timestamp_ms=0)
+        
 
 def run_face_detection(img):
     res = model_face.process(img)
@@ -113,6 +120,7 @@ class VideoCapture:
         self.frame=None
         t = Thread(target=self.capture_thread)
         t.start()
+
 
     
         
@@ -158,7 +166,7 @@ def vision_thread():
                 start_time = time.time()
                 ct.d["FPS"] = f"{fps: 5.02f}"
 
-            img = cap.frame
+            img = cap.frame.copy()
         
             img = preprocess(img)
             model_hand.process(img)

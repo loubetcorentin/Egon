@@ -7,7 +7,7 @@ import time
 
 
 def random_forget():
-    if random.random() < 0.95:
+    if random.random() < 0.98:
 
         mem = ShortTermMem.get_short_term_mem()
         for key in list(mem.keys()):
@@ -25,7 +25,7 @@ def random_forget():
 
 def forgetting_thread():
     while True:
-        time.sleep(0.2)
+        time.sleep(0.9)
         random_forget()
 
 
