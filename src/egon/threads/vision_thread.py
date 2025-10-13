@@ -118,7 +118,7 @@ class VideoCapture:
         self.cap = cv2.VideoCapture(0)
         self.cap.set(cv2.CAP_PROP_BUFFERSIZE,0)
         self.frame=None
-        t = Thread(target=self.capture_thread)
+        t = Thread(target=self.capture_thread, daemon=True)
         t.start()
 
 
