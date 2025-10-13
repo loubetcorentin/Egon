@@ -27,8 +27,9 @@ def do_I_like_something(stuff_seen):
         logger.info("🧠 old stuff disapointed")
         BRAIN.get_disapointed()
         BRAIN.next_now.set()
-        ono = get_bored_ono()
-        Voice.say(ono)
+        # ono = get_bored_ono()
+        # Voice.say(ono)
+        Voice.say_bored_sound()
 
     else:
         # new this is good
@@ -39,7 +40,8 @@ def do_I_like_something(stuff_seen):
         BRAIN.next_now.set()
         ono = get_excited_ono()
         # Voice.say(ono)
-        Voice.say(new_thing + ono)
+        # Voice.say(ono)
+        Voice.say_happy_sound()
 
 
 def search():

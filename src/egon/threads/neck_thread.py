@@ -73,10 +73,10 @@ def play_movement(args):
 
 def neck_thread():
     CT = ConsoleTable("neck thread", index=8)
-
+    CT.d['state'] = "init l76"
     Neck.init_neck()
 
-
+    CT.d['state'] = "Neck init done"
 
 
     current_state = BRAIN.SM.current_state
@@ -99,6 +99,7 @@ def neck_thread():
 
 
     to_the_left = True
+    CT.d['state'] = "about to start while truel 102"
     while True:
 
         

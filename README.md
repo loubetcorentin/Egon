@@ -31,3 +31,13 @@ modules/ : modules and classes used by the threads
 - short_term_memory.py : stores the things seen by the 
 
 
+
+
+#!/bin/bash
+
+export DISPLAY=:0
+export XAUTHORITY=/home/lan/.Xauthority
+
+sudo /bin/chmod 666 /dev/ttyACM0
+
+gnome-terminal -- bash -c "/home/lan/anaconda3/envs/egon2/bin/python /home/lan/Documents/Github/Egon/main.py; exec bash"

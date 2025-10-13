@@ -28,6 +28,9 @@ class Voice:
     speaker = "en_1"
     device = torch.device("cpu")
 
+    excited_sound_path = None
+    bored_sound_path = None
+
     CT = ConsoleTable("🗨️ 👄 💬 Voice", index=6)
 
     @classmethod
@@ -47,6 +50,9 @@ class Voice:
             speaker=cls.model_id,
         )
         cls.MODEL.to(cls.device)
+
+        cls.generate_next_sound("excited")
+        cls.generate_next_sound("bored")
 
     @classmethod
     def play_wav(cls, path="test.wav"):
@@ -88,6 +94,48 @@ class Voice:
         cls.shutup()
         cls.play_wav(audio_path)
 
+    @classmethod
+    def generate_next_sound(cls,emotion):
+        if emotion =="excited":
+            new_str = get_excited_ono()
+        elif emotion == "bored":
+            new_str = get_bored_ono()
+
+        audio_path = f"audio_files/{new_str}.wav"
+
+        if not os.path.isfile(audio_path):
+            logger.debug("creating new .wav")
+            cls.MODEL.save_wav(
+                text=new_str,
+                audio_path=audio_path,
+                speaker=cls.speaker,
+                sample_rate=cls.sample_rate,
+            )
+        if emotion =="excited":
+            cls.excited_sound_path = audio_path
+        elif emotion == "bored":
+            cls.bored_sound_path = audio_path
+
+        
+
+    @classmethod
+    def say_happy_sound(cls):
+        
+        logger.info(f"💅👁️👄👁️ 💅 💬 latest excited sound")
+        cls.shutup()
+        cls.play_wav(cls.excited_sound_path)
+
+        cls.generate_next_sound("excited")
+    
+    @classmethod
+    def say_bored_sound(cls):        
+        logger.info(f"💅👁️👄👁️ 💅 💬 latest bored sound")
+        cls.shutup()
+        cls.play_wav(cls.bored_sound_path)
+
+        cls.generate_next_sound("bored")
+
+        
 
 def get_excited_ono():
 

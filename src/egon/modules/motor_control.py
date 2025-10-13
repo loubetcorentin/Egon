@@ -68,7 +68,9 @@ class Neck:
         logger.info(f"🦿🙃🦿 {cls.PORT}")
         
         cls.board = pyfirmata2.Arduino(cls.PORT)
+        logger.info(f"🦿🙃🦿 {cls.board}")
         cls.pin = cls.board.get_pin("d:9:s")
+        logger.info(f"🦿🙃🦿 {cls.pin}")
         cls.BS = BufferServo(cls.pin)
         logger.info("[#55FF88][r]🦿🙃🦿 succesful [/r][/#55FF88]")
 
